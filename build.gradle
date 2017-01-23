@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'signing'
+    id 'org.spongepowered.plugin' version '0.8.1'
+    id 'net.minecrell.licenser' version '0.3'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+compileJava.options.encoding = 'UTF-8'
+
+group = pluginGroup
+version = pluginVersion
+
+dependencies {
+    compile 'org.spongepowered:spongeapi:5.1.0-SNAPSHOT'
+}
+
+sponge.plugin.id = pluginId
+
+license {
+
+    header = project.file('HEADER.txt')
+
+    include '**/*.java'
+    exclude '**/Metrics.java'
+
+}
+
+signing {
+    required false
+    sign configurations.archives
+}
