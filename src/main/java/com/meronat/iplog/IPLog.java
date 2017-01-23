@@ -25,6 +25,8 @@
 
 package com.meronat.iplog;
 
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import com.meronat.iplog.commands.AddCommand;
 import com.meronat.iplog.commands.AliasCommand;
 import com.meronat.iplog.commands.BaseCommand;
@@ -34,20 +36,15 @@ import com.meronat.iplog.commands.IpElement;
 import com.meronat.iplog.commands.LookupCommand;
 import com.meronat.iplog.commands.PurgeCommand;
 import com.meronat.iplog.storage.Storage;
-
+import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
-
-import org.slf4j.Logger;
-
-import com.google.common.collect.Lists;
-import com.google.inject.Inject;
 
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -71,12 +68,12 @@ public final class IPLog {
     private Path parentPath;
 
     @Inject
-    public IPLog(Logger logger, @DefaultConfig(sharedRoot = false) Path path) {
+    public IPLog(Logger logger, @ConfigDir(sharedRoot = false) Path path) {
 
         plugin = this;
 
         this.logger = logger;
-        this.parentPath = path.getParent();
+        this.parentPath = path;
 
     }
 

@@ -72,11 +72,7 @@ public class AddCommand implements CommandExecutor {
 
         }
 
-        Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> {
-
-            IPLog.getPlugin().getStorage().addConnection(ip, user.getUniqueId(), LocalDateTime.now());
-
-        });
+        Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> IPLog.getPlugin().getStorage().addConnection(ip, user.getUniqueId(), LocalDateTime.now()));
 
         src.sendMessage(Text.of(TextColors.YELLOW, "You have successfully added the specified player-IP connection to the registry."));
 
