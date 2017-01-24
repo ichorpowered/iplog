@@ -57,7 +57,7 @@ public class HistoryCommand implements CommandExecutor {
 
         Optional<InetAddress> optionalAddress = args.getOne("ip");
 
-        if (!optionalUser.isPresent() && !optionalAddress.isPresent()) {
+        if (optionalUser.isPresent() && optionalAddress.isPresent()) {
 
             throw new CommandException(Text.of(TextColors.RED, "You must specify either an IP address or player, but not both."));
 

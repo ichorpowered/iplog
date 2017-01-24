@@ -81,7 +81,7 @@ public class Storage {
         try (Connection conn = getConnection()) {
 
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS REGISTRY("
-                + " IP CHAR(45),"
+                + " IP VARCHAR(45),"
                 + " ID CHAR(36),"
                 + " INSTANT DATETIME,"
                 + " PRIMARY KEY(IP, ID))").execute();

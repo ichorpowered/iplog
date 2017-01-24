@@ -4,7 +4,7 @@ plugins {
     id 'signing'
     id 'org.spongepowered.plugin' version '0.8.1'
     id 'net.minecrell.licenser' version '0.3'
-    id "com.github.johnrengelman.shadow" version "1.2.3"
+    id "com.github.johnrengelman.shadow" version "1.2.4"
 }
 
 sourceCompatibility = 1.8
@@ -22,18 +22,15 @@ repositories {
     }
 }
 
-configurations {
-    shade
-
-    compile.extendsFrom shade
+shadowJar {
+    dependencies {
+        include dependency("co.aikar:taskchain-sponge")
+    }
 }
-
-shadowJar.configurations = [project.configurations.shade]
 
 dependencies {
     compile 'org.spongepowered:spongeapi:5.1.0-SNAPSHOT'
-
-    shade "co.aikar:taskchain-sponge:3.4.3"
+    compile "co.aikar:taskchain-sponge:3.4.3"
 }
 
 sponge.plugin.id = pluginId
