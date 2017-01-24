@@ -62,7 +62,7 @@ import java.util.Map;
     version = "0.1.0",
     description = "Connects IP addresses to users, allowing you to catch alternates and similar.",
     url = "http://meronat.com",
-    authors = {"Meronat", "Nighteyes604"})
+    authors = {"Meronat", "Nighteyes604", "Redrield"})
 public final class IPLog {
 
     private static IPLog plugin;
