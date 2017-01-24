@@ -67,77 +67,63 @@ public class HistoryCommand implements CommandExecutor {
 
         if (optionalAddress.isPresent()) {
 
-            Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> {
+            InetAddress addr = optionalAddress.get();
+            User player = optionalUser.get();
 
-                Map<UUID, LocalDateTime> users = IPLog.getPlugin().getStorage().getPlayersAndTime(optionalAddress.get());
+            IPLog.newChain()
+                    .asyncFirst(() -> {
+                        Map<UUID, LocalDateTime> users = IPLog.getPlugin().getStorage().getPlayersAndTime(addr);
 
-                if (users.isEmpty()) {
+                        if(users.isEmpty()) {
+                            src.sendMessage(Text.of(TextColors.RED, "There are no players associated with the specified IP address."));
+                            return null;
+                        }
+                        return users;
+                    })
+                    .abortIfNull()
+                    .syncLast(users -> {
+                        UserStorageService userStorageService = Sponge.getServiceManager().provide(UserStorageService.class).get();
+                        List<Text> contents = new ArrayList<>();
 
-                    src.sendMessage(Text.of(TextColors.RED, "There are no players associated with the specified IP address."));
+                        users.entrySet().forEach(e -> userStorageService.get(e.getKey()).ifPresent(user -> contents.add(Text.of(TextColors.DARK_GREEN, user.getName(),
+                                TextColors.GRAY, "    ", timeFormatter.format(e.getValue())))));
 
-                    return;
-
-                }
-
-                Sponge.getScheduler().createSyncExecutor(IPLog.getPlugin()).execute(() -> {
-
-                    UserStorageService userStorageService = Sponge.getServiceManager().provide(UserStorageService.class).get();
-
-                    List<Text> contents = new ArrayList<>();
-
-                    for (Map.Entry<UUID, LocalDateTime> e : users.entrySet()) {
-
-                        userStorageService.get(e.getKey()).ifPresent(user -> contents.add(Text.of(TextColors.DARK_GREEN, user.getName(),
-                            TextColors.GRAY, "    ", timeFormatter.format(e.getValue()))));
-
-                    }
-
-                    Sponge.getServiceManager().provide(PaginationService.class).ifPresent(p -> p.builder()
-                        .title(Text.of(TextColors.DARK_GREEN, "User Logins Associated With ", TextColors.GREEN, optionalAddress.get().getHostAddress()))
-                        .contents(contents)
-                        .linesPerPage(14)
-                        .padding(Text.of(TextColors.GRAY, "="))
-                        .sendTo(src));
-
-                });
-
-            });
+                        Sponge.getServiceManager().provide(PaginationService.class).get().builder()
+                                .title(Text.of(TextColors.DARK_GREEN, "User Logins Associated With", TextColors.GREEN, player.getName()))
+                                .contents(contents)
+                                .linesPerPage(14)
+                                .padding(Text.of(TextColors.GRAY, "="))
+                                .sendTo(src);
+                    }).execute();
 
         } else if (optionalUser.isPresent()) {
+            User player = optionalUser.get();
 
-            Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> {
+            IPLog.newChain()
+                    .asyncFirst(() -> {
+                        Map<String, LocalDateTime> addresses = IPLog.getPlugin().getStorage().getAddressesAndTime(player.getUniqueId());
 
-                Map<String, LocalDateTime> addresses = IPLog.getPlugin().getStorage().getAddressesAndTime(optionalUser.get().getUniqueId());
+                        if(addresses.isEmpty()) {
+                            src.sendMessage(Text.of(TextColors.RED, "There are no IP addresses associated with the specified user."));
+                            return null;
+                        }
 
-                if (addresses.isEmpty()) {
+                        return addresses;
+                    })
+                    .abortIfNull()
+                    .syncLast(addresses -> {
+                        List<Text> contents = new ArrayList<>();
 
-                    src.sendMessage(Text.of(TextColors.RED, "There are no IP addresses associated with the specified user."));
+                        addresses.entrySet().forEach(e -> contents.add(Text.of(TextColors.DARK_GREEN, e.getKey(), "    ", timeFormatter.format(e.getValue()))));
 
-                    return;
-
-                }
-
-                Sponge.getScheduler().createSyncExecutor(IPLog.getPlugin()).execute(() -> {
-
-                    List<Text> contents = new ArrayList<>();
-
-                    for (Map.Entry<String, LocalDateTime> e : addresses.entrySet()) {
-
-                        contents.add(Text.of(TextColors.DARK_GREEN, e.getKey(), "    ", timeFormatter.format(e.getValue())));
-
-                    }
-
-                    Sponge.getServiceManager().provide(PaginationService.class).ifPresent(p -> p.builder()
-                        .title(Text.of(TextColors.DARK_GREEN, "IP Logins Associated With ", TextColors.GREEN, optionalUser.get().getName()))
-                        .contents(contents)
-                        .linesPerPage(14)
-                        .padding(Text.of(TextColors.GRAY, "="))
-                        .sendTo(src));
-
-                });
-
-            });
-
+                        Sponge.getServiceManager().provide(PaginationService.class).get().builder()
+                                .title(Text.of(TextColors.DARK_GREEN, "IP Logins Associated With ", TextColors.GREEN, player.getName()))
+                                .contents(contents)
+                                .linesPerPage(14)
+                                .padding(Text.of(TextColors.GRAY, "="))
+                                .sendTo(src);
+                    })
+                    .execute();
         } else {
 
             throw new CommandException(Text.of(TextColors.RED, "You must specify either an IP address or a player."));

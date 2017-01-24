@@ -26,7 +26,6 @@
 package com.meronat.iplog.commands;
 
 import com.meronat.iplog.IPLog;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -55,29 +54,23 @@ public class LookupCommand implements CommandExecutor {
         Optional<InetAddress> optionalAddress = args.getOne("ip");
 
         if (optionalUser.isPresent() && optionalAddress.isPresent()) {
-
             throw new CommandException(Text.of(TextColors.RED, "You must specify either an IP address or player, but not both."));
-
         }
 
         if (optionalAddress.isPresent()) {
 
-            Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> {
-
-                Set<UUID> users = IPLog.getPlugin().getStorage().getPlayers(optionalAddress.get());
-
-                if (users.isEmpty()) {
-
-                    src.sendMessage(Text.of(TextColors.RED, "There are no users associated with this ip."));
-
-                    return;
-
-                }
-
-                Sponge.getScheduler().createSyncExecutor(IPLog.getPlugin()).execute(() -> {
-
+            IPLog.newChain()
+                .asyncFirst(() -> {
+                    Set<UUID> users = IPLog.getPlugin().getStorage().getPlayers(optionalAddress.get());
+                    if (users.isEmpty()) {
+                        src.sendMessage(Text.of(TextColors.RED, "There are no users associated with this ip."));
+                        return null;
+                    }
+                    return users;
+                })
+                .abortIfNull()
+                .syncLast(users -> {
                     UserStorageService userStorageService = Sponge.getServiceManager().provide(UserStorageService.class).get();
-
                     Sponge.getServiceManager().provide(PaginationService.class).ifPresent(p -> p.builder()
                         .title(Text.of(TextColors.DARK_GREEN, "Users Associated With ", TextColors.GREEN, optionalAddress.get().getHostAddress()))
                         .contents(users.stream()
@@ -91,43 +84,30 @@ public class LookupCommand implements CommandExecutor {
                         .linesPerPage(14)
                         .padding(Text.of(TextColors.GRAY, "="))
                         .sendTo(src));
-
-                });
-
-            });
+                }).execute();
 
         } else if (optionalUser.isPresent()) {
 
-            Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> {
-
-                Set<String> ips = IPLog.getPlugin().getStorage().getAddresses(optionalUser.get().getUniqueId());
-
-                if (ips.isEmpty()) {
-
-                    src.sendMessage(Text.of(TextColors.RED, "There are no ips associated with this user."));
-
-                    return;
-
-                }
-
-                Sponge.getScheduler().createSyncExecutor(IPLog.getPlugin()).execute(() -> {
-
-                    Sponge.getServiceManager().provide(PaginationService.class).ifPresent(p -> p.builder()
-                        .title(Text.of(TextColors.DARK_GREEN, "IPs Associated With ", TextColors.GREEN, optionalUser.get().getName()))
-                        .contents(ips.stream().map(ip -> Text.of(TextColors.DARK_GREEN, ip)).collect(Collectors.toList()))
-                        .linesPerPage(14)
-                        .padding(Text.of(TextColors.GRAY, "="))
-                        .sendTo(src));
-
-                });
-
-            });
-
+            IPLog.newChain()
+                    .asyncFirst(() -> {
+                        Set<String> ips = IPLog.getPlugin().getStorage().getAddresses(optionalUser.get().getUniqueId());
+                        if(ips.isEmpty()) {
+                            src.sendMessage(Text.of(TextColors.RED, "There are no ips associated with this user."));
+                            return null;
+                        }
+                        return ips;
+                    })
+                    .abortIfNull()
+                    .syncLast(ips -> Sponge.getServiceManager().provide(PaginationService.class).get().builder()
+                            .title(Text.of(TextColors.DARK_GREEN, "IPs Associated With ", TextColors.GREEN, optionalUser.get().getName()))
+                            .contents(ips.stream().map(ip -> Text.of(TextColors.DARK_GREEN, ip)).collect(Collectors.toList()))
+                            .linesPerPage(14)
+                            .padding(Text.of(TextColors.GRAY, "="))
+                            .sendTo(src))
+                    .execute();
 
         } else {
-
             throw new CommandException(Text.of(TextColors.RED, "You must specify either an IP address or a player."));
-
         }
 
         return CommandResult.success();

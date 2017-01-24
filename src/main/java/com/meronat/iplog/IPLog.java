@@ -25,6 +25,11 @@
 
 package com.meronat.iplog;
 
+import co.aikar.taskchain.SpongeTaskChainFactory;
+import co.aikar.taskchain.TaskChain;
+import co.aikar.taskchain.TaskChainFactory;
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import com.meronat.iplog.commands.AddCommand;
 import com.meronat.iplog.commands.AliasCommand;
 import com.meronat.iplog.commands.BaseCommand;
@@ -34,20 +39,16 @@ import com.meronat.iplog.commands.IpElement;
 import com.meronat.iplog.commands.LookupCommand;
 import com.meronat.iplog.commands.PurgeCommand;
 import com.meronat.iplog.storage.Storage;
-
+import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
-
-import org.slf4j.Logger;
-
-import com.google.common.collect.Lists;
-import com.google.inject.Inject;
 
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -61,7 +62,7 @@ import java.util.Map;
     version = "0.1.0",
     description = "Connects IP addresses to users, allowing you to catch alternates and similar.",
     url = "http://meronat.com",
-    authors = {"Meronat", "Nighteyes604"})
+    authors = {"Meronat", "Nighteyes604", "Redrield"})
 public final class IPLog {
 
     private static IPLog plugin;
@@ -69,19 +70,25 @@ public final class IPLog {
     private Logger logger;
     private Storage storage;
     private Path parentPath;
+    private PluginContainer pluginContainer;
+
+    private static TaskChainFactory factory;
 
     @Inject
-    public IPLog(Logger logger, @DefaultConfig(sharedRoot = false) Path path) {
+    public IPLog(Logger logger, @ConfigDir(sharedRoot = false) Path path, PluginContainer pluginContainer) {
 
         plugin = this;
 
         this.logger = logger;
-        this.parentPath = path.getParent();
+        this.parentPath = path;
+        this.pluginContainer = pluginContainer;
 
     }
 
     @Listener
     public void onGamePreInitialization(GamePreInitializationEvent event) {
+
+        factory = SpongeTaskChainFactory.create(pluginContainer);
 
         try {
 
@@ -185,10 +192,21 @@ public final class IPLog {
 
     }
 
+    public PluginContainer getPluginContainer() {
+        return pluginContainer;
+    }
+
     public static IPLog getPlugin() {
 
         return plugin;
 
     }
 
+    public static <T> TaskChain<T> newChain() {
+        return factory.newChain();
+    }
+
+    public static <T> TaskChain<T> newSharedChain(String name) {
+        return factory.newSharedChain(name);
+    }
 }
