@@ -25,6 +25,9 @@
 
 package com.meronat.iplog;
 
+import co.aikar.taskchain.SpongeTaskChainFactory;
+import co.aikar.taskchain.TaskChain;
+import co.aikar.taskchain.TaskChainFactory;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.meronat.iplog.commands.AddCommand;
@@ -44,6 +47,7 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
 import java.nio.file.Path;
@@ -66,19 +70,25 @@ public final class IPLog {
     private Logger logger;
     private Storage storage;
     private Path parentPath;
+    private PluginContainer pluginContainer;
+
+    private static TaskChainFactory factory;
 
     @Inject
-    public IPLog(Logger logger, @ConfigDir(sharedRoot = false) Path path) {
+    public IPLog(Logger logger, @ConfigDir(sharedRoot = false) Path path, PluginContainer pluginContainer) {
 
         plugin = this;
 
         this.logger = logger;
         this.parentPath = path;
+        this.pluginContainer = pluginContainer;
 
     }
 
     @Listener
     public void onGamePreInitialization(GamePreInitializationEvent event) {
+
+        factory = SpongeTaskChainFactory.create(pluginContainer);
 
         try {
 
@@ -182,10 +192,21 @@ public final class IPLog {
 
     }
 
+    public PluginContainer getPluginContainer() {
+        return pluginContainer;
+    }
+
     public static IPLog getPlugin() {
 
         return plugin;
 
     }
 
+    public static <T> TaskChain<T> newChain() {
+        return factory.newChain();
+    }
+
+    public static <T> TaskChain<T> newSharedChain(String name) {
+        return factory.newSharedChain(name);
+    }
 }

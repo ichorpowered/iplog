@@ -26,7 +26,6 @@
 package com.meronat.iplog.commands;
 
 import com.meronat.iplog.IPLog;
-
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -40,8 +39,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class AliasCommand implements CommandExecutor {
@@ -59,32 +56,23 @@ public class AliasCommand implements CommandExecutor {
 
         User user = optionalUser.get();
 
-        // TODO: Taskchain(?)
-        Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> {
-
-            Set<UUID> users = IPLog.getPlugin().getStorage().getAliases(user.getUniqueId());
-
-            Sponge.getScheduler().createSyncExecutor(IPLog.getPlugin()).execute(() -> {
-
-                UserStorageService userStorageService = Sponge.getServiceManager().provide(UserStorageService.class).get();
-
-                Sponge.getServiceManager().provide(PaginationService.class).get().builder()
-                    .title(Text.of(TextColors.DARK_GREEN, "Aliases Of ", TextColors.GREEN, user.getName()))
-                    .contents(users.stream()
-                        .map(userStorageService::get)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .map(User::getName)
-                        .map(Text::of)
-                        .map(username -> Text.of(TextColors.DARK_GREEN, username))
-                        .collect(Collectors.toList()))
-                    .linesPerPage(14)
-                    .padding(Text.of(TextColors.GRAY, "="))
-                    .sendTo(src);
-
-            });
-
-        });
+        IPLog.newChain()
+                .asyncFirst(() -> IPLog.getPlugin().getStorage().getAliases(user.getUniqueId()))
+                .syncLast(users -> {
+                    UserStorageService userStorageService = Sponge.getServiceManager().provide(UserStorageService.class).get();
+                    Sponge.getServiceManager().provide(PaginationService.class).get().builder()
+                            .title(Text.of(TextColors.DARK_GREEN, "Aliases of ", TextColors.GREEN, user.getName()))
+                            .contents(users.stream()
+                                    .map(userStorageService::get)
+                                    .filter(Optional::isPresent)
+                                    .map(Optional::get)
+                                    .map(Text::of)
+                                    .map(username -> Text.of(TextColors.DARK_GREEN, username))
+                                    .collect(Collectors.toList()))
+                            .linesPerPage(14)
+                            .padding(Text.of(TextColors.GRAY, "="))
+                            .sendTo(src);
+                }).execute();
 
         return CommandResult.success();
 
