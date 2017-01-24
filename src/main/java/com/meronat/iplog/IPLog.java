@@ -59,7 +59,7 @@ import java.util.Map;
 @Plugin(
     id = "iplog",
     name = "IPLog",
-    version = "0.1.0",
+    version = "0.2.0",
     description = "Connects IP addresses to users, allowing you to catch alternates and similar.",
     url = "http://meronat.com",
     authors = {"Meronat", "Nighteyes604", "Redrield"})

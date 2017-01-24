@@ -46,7 +46,7 @@ public class HelpCommand implements CommandExecutor {
 
         List<Text> contents = new ArrayList<>();
 
-        contents.add(formatHelpText("/ip", "Displays basic information about IPLog.", Text.of("IPLog v0.1.0")));
+        contents.add(formatHelpText("/ip", "Displays basic information about IPLog.", Text.of("IPLog v0.2.0")));
 
         contents.add(formatHelpText("/ip help", "Displays this page, giving information about IPLog commands.", Text.of("Click here for help")));
 
