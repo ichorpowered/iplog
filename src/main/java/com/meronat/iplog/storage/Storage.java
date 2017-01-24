@@ -81,8 +81,8 @@ public class Storage {
         try (Connection conn = getConnection()) {
 
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS REGISTRY("
-                + " IP VARCHAR(45),"
-                + " ID VARCHAR(36),"
+                + " IP CHAR(45),"
+                + " ID CHAR(36),"
                 + " INSTANT DATETIME,"
                 + " PRIMARY KEY(IP, ID))").execute();
 
@@ -104,7 +104,7 @@ public class Storage {
 
         } catch (SQLException e) {
 
-            IPLog.getPlugin().getLogger().error("Failed to very existence of player");
+            IPLog.getPlugin().getLogger().error("Failed to verify existence of player");
             e.printStackTrace();
 
         }

@@ -98,6 +98,7 @@ public class LookupCommand implements CommandExecutor {
 
         } else if (optionalUser.isPresent()) {
 
+            //TODO: Taskchain(?)
             Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> {
 
                 Set<String> ips = IPLog.getPlugin().getStorage().getAddresses(optionalUser.get().getUniqueId());

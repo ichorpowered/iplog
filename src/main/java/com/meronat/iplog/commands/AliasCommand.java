@@ -59,6 +59,7 @@ public class AliasCommand implements CommandExecutor {
 
         User user = optionalUser.get();
 
+        // TODO: Taskchain(?)
         Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> {
 
             Set<UUID> users = IPLog.getPlugin().getStorage().getAliases(user.getUniqueId());
