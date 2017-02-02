@@ -63,12 +63,12 @@ public class AddCommand implements CommandExecutor {
         InetAddress ip = optionalIP.get();
 
         if (IPLog.getPlugin().getStorage().isPresent(ip, user.getUniqueId())) {
-            throw new CommandException(Text.of(TextColors.RED, "This connection already exists in the registry."));
+            throw new CommandException(Text.of(TextColors.RED, "This connection already exists in the database."));
         }
 
         Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> IPLog.getPlugin().getStorage().addConnection(ip, user.getUniqueId(), LocalDateTime.now()));
 
-        src.sendMessage(Text.of(TextColors.YELLOW, "You have successfully added the specified player-IP connection to the registry."));
+        src.sendMessage(Text.of(TextColors.YELLOW, "You have successfully added the specified connection to the database."));
 
         return CommandResult.success();
 

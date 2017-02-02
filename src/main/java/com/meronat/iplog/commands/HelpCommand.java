@@ -48,9 +48,9 @@ public class HelpCommand implements CommandExecutor {
 
         contents.add(formatHelpText("/ip", "Displays basic information about IPLog.", Text.of("IPLog v0.2.0")));
 
-        contents.add(formatHelpText("/ip help", "Displays this page, giving information about IPLog commands.", Text.of("Click here for help")));
+        contents.add(formatHelpText("/ip help", "Displays this page, giving information about IPLog commands.", Text.of("Click here for IPLog help")));
 
-        contents.add(formatHelpText("/ip alias [player]", "Shows all possible players associated with this player.", Text.of("Good for finding alternates")));
+        contents.add(formatHelpText("/ip alias [player]", "Shows all possible players associated with this player.", Text.of("Good for finding alternate accounts")));
 
         contents.add(formatHelpText("/ip lookup [player]", "Lists all the IPs associated with the specified player.", Text.of("Can also be used with IPs")));
 

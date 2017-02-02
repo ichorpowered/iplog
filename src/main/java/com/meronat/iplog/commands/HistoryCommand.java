@@ -64,12 +64,9 @@ public class HistoryCommand implements CommandExecutor {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME.withLocale(src.getLocale());
 
         if (optionalAddress.isPresent()) {
-            InetAddress addr = optionalAddress.get();
-            User player = optionalUser.get();
-
             IPLog.newChain()
                     .asyncFirst(() -> {
-                        Map<UUID, LocalDateTime> users = IPLog.getPlugin().getStorage().getPlayersAndTime(addr);
+                        Map<UUID, LocalDateTime> users = IPLog.getPlugin().getStorage().getPlayersAndTime(optionalAddress.get());
 
                         if(users.isEmpty()) {
                             src.sendMessage(Text.of(TextColors.RED, "There are no players associated with the specified IP address."));
@@ -86,18 +83,16 @@ public class HistoryCommand implements CommandExecutor {
                                 TextColors.GRAY, "    ", timeFormatter.format(e.getValue())))));
 
                         Sponge.getServiceManager().provide(PaginationService.class).get().builder()
-                                .title(Text.of(TextColors.DARK_GREEN, "User Logins Associated With", TextColors.GREEN, player.getName()))
+                                .title(Text.of(TextColors.DARK_GREEN, "User History Associated With", TextColors.GREEN, optionalAddress.get().toString()))
                                 .contents(contents)
                                 .linesPerPage(14)
                                 .padding(Text.of(TextColors.GRAY, "="))
                                 .sendTo(src);
                     }).execute();
         } else if (optionalUser.isPresent()) {
-            User player = optionalUser.get();
-
             IPLog.newChain()
                     .asyncFirst(() -> {
-                        Map<String, LocalDateTime> addresses = IPLog.getPlugin().getStorage().getAddressesAndTime(player.getUniqueId());
+                        Map<String, LocalDateTime> addresses = IPLog.getPlugin().getStorage().getAddressesAndTime(optionalUser.get().getUniqueId());
 
                         if(addresses.isEmpty()) {
                             src.sendMessage(Text.of(TextColors.RED, "There are no IP addresses associated with the specified user."));
@@ -113,7 +108,7 @@ public class HistoryCommand implements CommandExecutor {
                         addresses.entrySet().forEach(e -> contents.add(Text.of(TextColors.DARK_GREEN, e.getKey(), "    ", timeFormatter.format(e.getValue()))));
 
                         Sponge.getServiceManager().provide(PaginationService.class).get().builder()
-                                .title(Text.of(TextColors.DARK_GREEN, "IP Logins Associated With ", TextColors.GREEN, player.getName()))
+                                .title(Text.of(TextColors.DARK_GREEN, "IP History Associated With ", TextColors.GREEN, optionalUser.get().getName()))
                                 .contents(contents)
                                 .linesPerPage(14)
                                 .padding(Text.of(TextColors.GRAY, "="))
