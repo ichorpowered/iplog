@@ -49,17 +49,13 @@ public class AddCommand implements CommandExecutor {
         Optional<User> optionalUser = args.getOne("player");
 
         if (!optionalUser.isPresent()) {
-
             throw new CommandException(Text.of(TextColors.RED, "You must specify an existing user."));
-
         }
 
         Optional<InetAddress> optionalIP = args.getOne("ip");
 
         if (!optionalIP.isPresent()) {
-
             throw new CommandException(Text.of(TextColors.RED, "You must specify a proper IP address."));
-
         }
 
         User user = optionalUser.get();
@@ -67,9 +63,7 @@ public class AddCommand implements CommandExecutor {
         InetAddress ip = optionalIP.get();
 
         if (IPLog.getPlugin().getStorage().isPresent(ip, user.getUniqueId())) {
-
             throw new CommandException(Text.of(TextColors.RED, "This connection already exists in the registry."));
-
         }
 
         Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> IPLog.getPlugin().getStorage().addConnection(ip, user.getUniqueId(), LocalDateTime.now()));

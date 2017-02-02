@@ -25,11 +25,6 @@
 
 package com.meronat.iplog;
 
-import co.aikar.taskchain.SpongeTaskChainFactory;
-import co.aikar.taskchain.TaskChain;
-import co.aikar.taskchain.TaskChainFactory;
-import com.google.common.collect.Lists;
-import com.google.inject.Inject;
 import com.meronat.iplog.commands.AddCommand;
 import com.meronat.iplog.commands.AliasCommand;
 import com.meronat.iplog.commands.BaseCommand;
@@ -38,8 +33,9 @@ import com.meronat.iplog.commands.HistoryCommand;
 import com.meronat.iplog.commands.IpElement;
 import com.meronat.iplog.commands.LookupCommand;
 import com.meronat.iplog.commands.PurgeCommand;
+import com.meronat.iplog.stats.Metrics;
 import com.meronat.iplog.storage.Storage;
-import org.slf4j.Logger;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -50,11 +46,20 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
+import org.slf4j.Logger;
+
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import co.aikar.taskchain.SpongeTaskChainFactory;
+import co.aikar.taskchain.TaskChain;
+import co.aikar.taskchain.TaskChainFactory;
 
 @Plugin(
     id = "iplog",
@@ -75,6 +80,9 @@ public final class IPLog {
     private static TaskChainFactory factory;
 
     @Inject
+    private Metrics metrics;
+
+    @Inject
     public IPLog(Logger logger, @ConfigDir(sharedRoot = false) Path path, PluginContainer pluginContainer) {
 
         plugin = this;
@@ -91,17 +99,12 @@ public final class IPLog {
         factory = SpongeTaskChainFactory.create(pluginContainer);
 
         try {
-
             storage = new Storage();
-
         } catch (SQLException e) {
-
             this.logger.warn("IPLog will not load as it failed to connect or load storage.");
-
             e.printStackTrace();
 
             return;
-
         }
 
         registerCommands();
@@ -193,13 +196,11 @@ public final class IPLog {
     }
 
     public PluginContainer getPluginContainer() {
-        return pluginContainer;
+        return this.pluginContainer;
     }
 
     public static IPLog getPlugin() {
-
         return plugin;
-
     }
 
     public static <T> TaskChain<T> newChain() {

@@ -44,7 +44,6 @@ public class JoinListener {
         Storage storage = IPLog.getPlugin().getStorage();
 
         if (!player.hasPermission("iplog.bypasslogging")) {
-
             InetAddress ip = player.getConnection().getAddress().getAddress();
 
             UUID uuid = player.getUniqueId();
@@ -52,15 +51,10 @@ public class JoinListener {
             LocalDateTime time = LocalDateTime.now();
 
             if (storage.isPresent(ip, uuid)) {
-
                 storage.updateConnection(ip, uuid, time);
-
             } else {
-
                 storage.addConnection(ip, uuid, time);
-
             }
-
         }
 
     }

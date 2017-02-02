@@ -58,15 +58,12 @@ public class HistoryCommand implements CommandExecutor {
         Optional<InetAddress> optionalAddress = args.getOne("ip");
 
         if (optionalUser.isPresent() && optionalAddress.isPresent()) {
-
             throw new CommandException(Text.of(TextColors.RED, "You must specify either an IP address or player, but not both."));
-
         }
 
         DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME.withLocale(src.getLocale());
 
         if (optionalAddress.isPresent()) {
-
             InetAddress addr = optionalAddress.get();
             User player = optionalUser.get();
 
@@ -95,7 +92,6 @@ public class HistoryCommand implements CommandExecutor {
                                 .padding(Text.of(TextColors.GRAY, "="))
                                 .sendTo(src);
                     }).execute();
-
         } else if (optionalUser.isPresent()) {
             User player = optionalUser.get();
 
@@ -125,9 +121,7 @@ public class HistoryCommand implements CommandExecutor {
                     })
                     .execute();
         } else {
-
             throw new CommandException(Text.of(TextColors.RED, "You must specify either an IP address or a player."));
-
         }
 
         return CommandResult.success();

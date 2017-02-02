@@ -26,6 +26,7 @@
 package com.meronat.iplog.commands;
 
 import com.meronat.iplog.IPLog;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -49,9 +50,7 @@ public class AliasCommand implements CommandExecutor {
         Optional<User> optionalUser = args.getOne("player");
 
         if (!optionalUser.isPresent()) {
-
             throw new CommandException(Text.of(TextColors.RED, "You must specify an existing user."));
-
         }
 
         User user = optionalUser.get();

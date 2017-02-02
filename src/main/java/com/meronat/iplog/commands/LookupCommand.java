@@ -26,6 +26,7 @@
 package com.meronat.iplog.commands;
 
 import com.meronat.iplog.IPLog;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -58,7 +59,6 @@ public class LookupCommand implements CommandExecutor {
         }
 
         if (optionalAddress.isPresent()) {
-
             IPLog.newChain()
                 .asyncFirst(() -> {
                     Set<UUID> users = IPLog.getPlugin().getStorage().getPlayers(optionalAddress.get());
@@ -85,9 +85,7 @@ public class LookupCommand implements CommandExecutor {
                         .padding(Text.of(TextColors.GRAY, "="))
                         .sendTo(src));
                 }).execute();
-
         } else if (optionalUser.isPresent()) {
-
             IPLog.newChain()
                     .asyncFirst(() -> {
                         Set<String> ips = IPLog.getPlugin().getStorage().getAddresses(optionalUser.get().getUniqueId());
@@ -105,7 +103,6 @@ public class LookupCommand implements CommandExecutor {
                             .padding(Text.of(TextColors.GRAY, "="))
                             .sendTo(src))
                     .execute();
-
         } else {
             throw new CommandException(Text.of(TextColors.RED, "You must specify either an IP address or a player."));
         }

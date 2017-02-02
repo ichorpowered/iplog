@@ -48,17 +48,13 @@ public class PurgeCommand implements CommandExecutor {
         Optional<User> optionalUser = args.getOne("player");
 
         if (!optionalUser.isPresent()) {
-
             throw new CommandException(Text.of(TextColors.RED, "You must specify an existing user."));
-
         }
 
         Optional<InetAddress> optionalIP = args.getOne("ip");
 
         if (!optionalIP.isPresent()) {
-
             throw new CommandException(Text.of(TextColors.RED, "You must specify a proper IP address."));
-
         }
 
         User user = optionalUser.get();

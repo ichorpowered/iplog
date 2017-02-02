@@ -50,35 +50,25 @@ public class IpElement extends CommandElement {
     protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
 
         if(!args.hasNext()) {
-
             throw args.createError(Text.of(TextColors.RED, "You must specify an IP address."));
-
         }
 
         try {
-
             return InetAddress.getByName(args.next());
-
         } catch (UnknownHostException e) {
-
             throw args.createError(Text.of(TextColors.RED, "This is not a valid IP address."));
-
         }
 
     }
 
     @Override
     public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-
         return new ArrayList<>();
-
     }
 
     @Override
     public Text getUsage(CommandSource src) {
-
         return Text.of("<ip address>");
-
     }
 
 }
