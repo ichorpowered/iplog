@@ -40,6 +40,8 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class AliasCommand implements CommandExecutor {
@@ -56,7 +58,21 @@ public class AliasCommand implements CommandExecutor {
         User user = optionalUser.get();
 
         IPLog.newChain()
-                .asyncFirst(() -> IPLog.getPlugin().getStorage().getAliases(user.getUniqueId()))
+                .asyncFirst(() -> {
+                    Set<UUID> users = IPLog.getPlugin().getStorage().getAliases(user.getUniqueId());
+                    if (src instanceof User) {
+                        UUID sender = ((User) src).getUniqueId();
+                        if (sender.equals(user.getUniqueId())) {
+                            users.remove(sender);
+                        }
+                    }
+                    if (users.size() == 0) {
+                        src.sendMessage(Text.of(TextColors.RED, "There are no aliases associated with the specified user."));
+                        return null;
+                    }
+                    return users;
+                })
+                .abortIfNull()
                 .syncLast(users -> {
                     UserStorageService userStorageService = Sponge.getServiceManager().provide(UserStorageService.class).get();
                     Sponge.getServiceManager().provide(PaginationService.class).get().builder()

@@ -63,7 +63,7 @@ public class LookupCommand implements CommandExecutor {
                 .asyncFirst(() -> {
                     Set<UUID> users = IPLog.getPlugin().getStorage().getPlayers(optionalAddress.get());
                     if (users.isEmpty()) {
-                        src.sendMessage(Text.of(TextColors.RED, "There are no users associated with this ip."));
+                        src.sendMessage(Text.of(TextColors.RED, "There are no users associated with this IP address."));
                         return null;
                     }
                     return users;
@@ -90,7 +90,7 @@ public class LookupCommand implements CommandExecutor {
                     .asyncFirst(() -> {
                         Set<String> ips = IPLog.getPlugin().getStorage().getAddresses(optionalUser.get().getUniqueId());
                         if(ips.isEmpty()) {
-                            src.sendMessage(Text.of(TextColors.RED, "There are no ips associated with this user."));
+                            src.sendMessage(Text.of(TextColors.RED, "There are no IP addresses associated with this user."));
                             return null;
                         }
                         return ips;

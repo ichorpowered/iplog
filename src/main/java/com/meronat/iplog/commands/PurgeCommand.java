@@ -63,7 +63,7 @@ public class PurgeCommand implements CommandExecutor {
 
         Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> IPLog.getPlugin().getStorage().purgeConnection(ip, user.getUniqueId()));
 
-        src.sendMessage(Text.of(TextColors.YELLOW, "You have successfully remove the specified player-IP connection from the registry."));
+        src.sendMessage(Text.of(TextColors.YELLOW, "You have successfully removed the specified connection from the database."));
 
         return CommandResult.success();
 

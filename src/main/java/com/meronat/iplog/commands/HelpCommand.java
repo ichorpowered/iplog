@@ -76,13 +76,11 @@ public class HelpCommand implements CommandExecutor {
     }
 
     private Text formatHelpText(String command, String description, Text extendedDescription) {
-
         return Text.of(Text.builder(command)
             .color(TextColors.GREEN)
             .onClick(TextActions.suggestCommand(command))
             .onHover(TextActions.showText(extendedDescription))
             .build(),Text.of(TextColors.GRAY, " - ", description));
-
     }
 
 }

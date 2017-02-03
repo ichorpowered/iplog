@@ -37,15 +37,11 @@ dependencies {
     shade "co.aikar:taskchain-sponge:3.4.3"
 }
 
-sponge.plugin.id = pluginId
-
 tasks.build.dependsOn(shadowJar)
 
 license {
-
     header = project.file('HEADER.txt')
 
     include '**/*.java'
     exclude '**/Metrics.java'
-
 }

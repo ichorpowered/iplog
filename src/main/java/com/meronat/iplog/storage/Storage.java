@@ -57,19 +57,13 @@ public class Storage {
     private Connection getConnection() throws SQLException {
 
         if (sql == null) {
-
             Optional<SqlService> optionalSql = Sponge.getServiceManager().provide(SqlService.class);
 
             if (optionalSql.isPresent()) {
-
                 sql = optionalSql.get();
-
             } else {
-
                 throw new SQLException("Sponge SQL service is missing.");
-
             }
-
         }
 
         return sql.getDataSource("jdbc:h2:" + IPLog.getPlugin().getParentPath().toAbsolutePath().toString() + "/storage.db").getConnection();
@@ -79,13 +73,11 @@ public class Storage {
     private void createTables() throws SQLException {
 
         try (Connection conn = getConnection()) {
-
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS REGISTRY("
                 + " IP VARCHAR(45),"
                 + " ID CHAR(36),"
                 + " INSTANT DATETIME,"
                 + " PRIMARY KEY(IP, ID))").execute();
-
         }
 
     }
@@ -96,17 +88,13 @@ public class Storage {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM REGISTRY WHERE IP = ? AND ID = ?");
         ) {
-
             ps.setString(1, ip.getHostAddress());
             ps.setString(2, uuid.toString());
 
             return ps.executeQuery().next();
-
         } catch (SQLException e) {
-
             IPLog.getPlugin().getLogger().error("Failed to verify existence of player");
             e.printStackTrace();
-
         }
 
         return false;
@@ -119,18 +107,14 @@ public class Storage {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("INSERT INTO REGISTRY(IP, ID, INSTANT) VALUES (?, ?, ?)");
         ) {
-
             ps.setString(1, ip.getHostAddress());
             ps.setString(2, uuid.toString());
             ps.setTimestamp(3, Timestamp.valueOf(time));
 
             ps.execute();
-
         } catch (SQLException e) {
-
             IPLog.getPlugin().getLogger().error("Failed to create new connection.");
             e.printStackTrace();
-
         }
 
     }
@@ -141,18 +125,14 @@ public class Storage {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("UPDATE REGISTRY SET INSTANT = ? WHERE IP = ? AND ID = ?");
         ) {
-
             ps.setTimestamp(1, Timestamp.valueOf(time));
             ps.setString(2, ip.getHostAddress());
             ps.setString(3, uuid.toString());
 
             ps.execute();
-
         } catch (SQLException e) {
-
             IPLog.getPlugin().getLogger().error("Failed to update old connection.");
             e.printStackTrace();
-
         }
 
     }
@@ -163,17 +143,13 @@ public class Storage {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("DELETE FROM REGISTRY WHERE IP = ? AND ID = ?");
         ) {
-
             ps.setString(1, ip.getHostAddress());
             ps.setString(2, uuid.toString());
 
             ps.execute();
-
         } catch (SQLException e) {
-
             IPLog.getPlugin().getLogger().error("Failed to purge connection.");
             e.printStackTrace();
-
         }
 
     }
@@ -186,24 +162,16 @@ public class Storage {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("SELECT DISTINCT(REG.ID) FROM REGISTRY JOIN REGISTRY REG ON (REGISTRY.IP = REG.IP) WHERE REGISTRY.ID = ?");
         ) {
-
             ps.setString(1, uuid.toString());
 
             try (ResultSet rs = ps.executeQuery()) {
-
                 while (rs.next()) {
-
                     aliases.add(UUID.fromString(rs.getString(1)));
-
                 }
-
             }
-
         } catch (SQLException e) {
-
             IPLog.getPlugin().getLogger().error("Failed to get all possible aliases of a player from storage.");
             e.printStackTrace();
-
         }
 
         return aliases;
@@ -218,24 +186,16 @@ public class Storage {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("SELECT ID FROM REGISTRY WHERE IP = ?");
         ) {
-
             ps.setString(1, ip.getHostAddress());
 
             try (ResultSet rs = ps.executeQuery()) {
-
                 while (rs.next()) {
-
                     players.add(UUID.fromString(rs.getString(1)));
-
                 }
-
             }
-
         } catch (SQLException e) {
-
             IPLog.getPlugin().getLogger().error("Failed to get all players connected to this ip address.");
             e.printStackTrace();
-
         }
 
         return players;
@@ -250,19 +210,13 @@ public class Storage {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("SELECT IP FROM REGISTRY WHERE ID = ?");
         ) {
-
             ps.setString(1, uuid.toString());
 
             try (ResultSet rs = ps.executeQuery()) {
-
                 while (rs.next()) {
-
                     addresses.add(rs.getString(1));
-
                 }
-
             }
-
         } catch (SQLException e) {
 
             IPLog.getPlugin().getLogger().error("Failed to get all ip addresses connected to this uuid.");
@@ -282,24 +236,16 @@ public class Storage {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("SELECT IP, INSTANT FROM REGISTRY WHERE ID = ? ORDER BY INSTANT");
         ) {
-
             ps.setString(1, uuid.toString());
 
             try (ResultSet rs = ps.executeQuery()) {
-
                 while (rs.next()) {
-
                     data.put(rs.getString(1), rs.getTimestamp(2).toLocalDateTime());
-
                 }
-
             }
-
         } catch (SQLException e) {
-
             IPLog.getPlugin().getLogger().error("Failed to get all ip addresses and dates connected to this uuid.");
             e.printStackTrace();
-
         }
 
         return data;
@@ -314,24 +260,16 @@ public class Storage {
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("SELECT ID, INSTANT FROM REGISTRY WHERE IP = ? ORDER BY INSTANT")
         ) {
-
             ps.setString(1, ip.getHostAddress());
 
             try (ResultSet rs = ps.executeQuery()) {
-
                 while (rs.next()) {
-
                     data.put(UUID.fromString(rs.getString(1)), rs.getTimestamp(2).toLocalDateTime());
-
                 }
-
             }
-
         } catch (SQLException e) {
-
             IPLog.getPlugin().getLogger().error("Failed to get all uuids and dates connected to this ip address.");
             e.printStackTrace();
-
         }
 
         return data;

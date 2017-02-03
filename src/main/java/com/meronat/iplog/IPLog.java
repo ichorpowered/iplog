@@ -64,7 +64,7 @@ import co.aikar.taskchain.TaskChainFactory;
 @Plugin(
     id = "iplog",
     name = "IPLog",
-    version = "0.2.0",
+    version = "0.1.1",
     description = "Connects IP addresses to users, allowing you to catch alternates and similar.",
     url = "http://meronat.com",
     authors = {"Meronat", "Nighteyes604", "Redrield"})
@@ -178,21 +178,15 @@ public final class IPLog {
     }
 
     public Path getParentPath() {
-
         return this.parentPath;
-
     }
 
     public Storage getStorage() {
-
         return this.storage;
-
     }
 
     public Logger getLogger() {
-
         return this.logger;
-
     }
 
     public PluginContainer getPluginContainer() {

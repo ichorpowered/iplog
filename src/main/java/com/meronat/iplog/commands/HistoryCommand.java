@@ -69,7 +69,7 @@ public class HistoryCommand implements CommandExecutor {
                         Map<UUID, LocalDateTime> users = IPLog.getPlugin().getStorage().getPlayersAndTime(optionalAddress.get());
 
                         if(users.isEmpty()) {
-                            src.sendMessage(Text.of(TextColors.RED, "There are no players associated with the specified IP address."));
+                            src.sendMessage(Text.of(TextColors.RED, "There are no players associated with this IP address."));
                             return null;
                         }
                         return users;
@@ -95,7 +95,7 @@ public class HistoryCommand implements CommandExecutor {
                         Map<String, LocalDateTime> addresses = IPLog.getPlugin().getStorage().getAddressesAndTime(optionalUser.get().getUniqueId());
 
                         if(addresses.isEmpty()) {
-                            src.sendMessage(Text.of(TextColors.RED, "There are no IP addresses associated with the specified user."));
+                            src.sendMessage(Text.of(TextColors.RED, "There are no IP addresses associated with this user."));
                             return null;
                         }
 
