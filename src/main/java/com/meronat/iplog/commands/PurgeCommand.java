@@ -44,29 +44,26 @@ public class PurgeCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
-        Optional<User> optionalUser = args.getOne("player");
+        final Optional<User> optionalUser = args.getOne("player");
 
         if (!optionalUser.isPresent()) {
             throw new CommandException(Text.of(TextColors.RED, "You must specify an existing user."));
         }
 
-        Optional<InetAddress> optionalIP = args.getOne("ip");
+        final Optional<InetAddress> optionalIP = args.getOne("ip");
 
         if (!optionalIP.isPresent()) {
             throw new CommandException(Text.of(TextColors.RED, "You must specify a proper IP address."));
         }
 
-        User user = optionalUser.get();
-
-        InetAddress ip = optionalIP.get();
+        final User user = optionalUser.get();
+        final InetAddress ip = optionalIP.get();
 
         Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> IPLog.getPlugin().getStorage().purgeConnection(ip, user.getUniqueId()));
 
         src.sendMessage(Text.of(TextColors.YELLOW, "You have successfully removed the specified connection from the database."));
 
         return CommandResult.success();
-
     }
 
 }

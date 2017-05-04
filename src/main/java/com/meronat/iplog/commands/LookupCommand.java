@@ -49,19 +49,17 @@ public class LookupCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
-        Optional<User> optionalUser = args.getOne("player");
-
-        Optional<InetAddress> optionalAddress = args.getOne("ip");
+        final Optional<User> optionalUser = args.getOne("player");
+        final Optional<InetAddress> optionalAddress = args.getOne("ip");
 
         if (optionalUser.isPresent() && optionalAddress.isPresent()) {
             throw new CommandException(Text.of(TextColors.RED, "You must specify either an IP address or player, but not both."));
         }
 
         if (optionalAddress.isPresent()) {
-            IPLog.newChain()
+            IPLog.getPlugin().newChain()
                 .asyncFirst(() -> {
-                    Set<UUID> users = IPLog.getPlugin().getStorage().getPlayers(optionalAddress.get());
+                    final Set<UUID> users = IPLog.getPlugin().getStorage().getPlayers(optionalAddress.get());
                     if (users.isEmpty()) {
                         src.sendMessage(Text.of(TextColors.RED, "There are no users associated with this IP address."));
                         return null;
@@ -70,7 +68,7 @@ public class LookupCommand implements CommandExecutor {
                 })
                 .abortIfNull()
                 .syncLast(users -> {
-                    UserStorageService userStorageService = Sponge.getServiceManager().provide(UserStorageService.class).get();
+                    final UserStorageService userStorageService = Sponge.getServiceManager().provide(UserStorageService.class).get();
                     Sponge.getServiceManager().provide(PaginationService.class).ifPresent(p -> p.builder()
                         .title(Text.of(TextColors.DARK_GREEN, "Users Associated With ", TextColors.GREEN, optionalAddress.get().getHostAddress()))
                         .contents(users.stream()
@@ -86,9 +84,9 @@ public class LookupCommand implements CommandExecutor {
                         .sendTo(src));
                 }).execute();
         } else if (optionalUser.isPresent()) {
-            IPLog.newChain()
+            IPLog.getPlugin().newChain()
                     .asyncFirst(() -> {
-                        Set<String> ips = IPLog.getPlugin().getStorage().getAddresses(optionalUser.get().getUniqueId());
+                        final Set<String> ips = IPLog.getPlugin().getStorage().getAddresses(optionalUser.get().getUniqueId());
                         if(ips.isEmpty()) {
                             src.sendMessage(Text.of(TextColors.RED, "There are no IP addresses associated with this user."));
                             return null;
@@ -108,7 +106,6 @@ public class LookupCommand implements CommandExecutor {
         }
 
         return CommandResult.success();
-
     }
 
 }

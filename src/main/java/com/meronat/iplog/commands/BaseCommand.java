@@ -41,7 +41,6 @@ public class BaseCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
         src.sendMessage(Text.of(TextColors.DARK_GREEN, "IPLog", " v", Sponge.getPluginManager().getPlugin("iplog").get().getVersion().get()));
         src.sendMessage(Text.of(TextColors.GRAY, "Created by ", StringUtils.join(Sponge.getPluginManager().getPlugin("iplog").get().getAuthors(), ", ")));
         src.sendMessage(Text.builder("Click here for ")
@@ -59,7 +58,6 @@ public class BaseCommand implements CommandExecutor {
                     .build()).build()).build());
 
         return CommandResult.success();
-
     }
 
 }

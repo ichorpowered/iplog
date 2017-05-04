@@ -45,22 +45,20 @@ public class AddCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
-        Optional<User> optionalUser = args.getOne("player");
+        final Optional<User> optionalUser = args.getOne("player");
 
         if (!optionalUser.isPresent()) {
             throw new CommandException(Text.of(TextColors.RED, "You must specify an existing user."));
         }
 
-        Optional<InetAddress> optionalIP = args.getOne("ip");
+        final Optional<InetAddress> optionalIP = args.getOne("ip");
 
         if (!optionalIP.isPresent()) {
             throw new CommandException(Text.of(TextColors.RED, "You must specify a proper IP address."));
         }
 
-        User user = optionalUser.get();
-
-        InetAddress ip = optionalIP.get();
+        final User user = optionalUser.get();
+        final InetAddress ip = optionalIP.get();
 
         if (IPLog.getPlugin().getStorage().isPresent(ip, user.getUniqueId())) {
             throw new CommandException(Text.of(TextColors.RED, "This connection already exists in the database."));
@@ -71,7 +69,6 @@ public class AddCommand implements CommandExecutor {
         src.sendMessage(Text.of(TextColors.YELLOW, "You have successfully added the specified connection to the database."));
 
         return CommandResult.success();
-
     }
 
 }

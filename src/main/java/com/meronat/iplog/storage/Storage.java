@@ -49,29 +49,25 @@ public class Storage {
     private SqlService sql;
 
     public Storage() throws SQLException {
-
         createTables();
-
     }
 
     private Connection getConnection() throws SQLException {
-
-        if (sql == null) {
+        if (this.sql == null) {
             Optional<SqlService> optionalSql = Sponge.getServiceManager().provide(SqlService.class);
 
             if (optionalSql.isPresent()) {
-                sql = optionalSql.get();
+                this.sql = optionalSql.get();
             } else {
                 throw new SQLException("Sponge SQL service is missing.");
             }
         }
 
-        return sql.getDataSource("jdbc:h2:" + IPLog.getPlugin().getParentPath().toAbsolutePath().toString() + "/storage.db").getConnection();
-
+        return this.sql.getDataSource("jdbc:h2:" + IPLog.getPlugin().getParentPath().toAbsolutePath().toString()
+                + "/storage.db").getConnection();
     }
 
     private void createTables() throws SQLException {
-
         try (Connection conn = getConnection()) {
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS REGISTRY("
                 + " IP VARCHAR(45),"
@@ -79,11 +75,9 @@ public class Storage {
                 + " INSTANT DATETIME,"
                 + " PRIMARY KEY(IP, ID))").execute();
         }
-
     }
 
     public boolean isPresent(InetAddress ip, UUID uuid) {
-
         try (
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM REGISTRY WHERE IP = ? AND ID = ?");
@@ -98,11 +92,9 @@ public class Storage {
         }
 
         return false;
-
     }
 
     public void addConnection(InetAddress ip, UUID uuid, LocalDateTime time) {
-
         try (
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("INSERT INTO REGISTRY(IP, ID, INSTANT) VALUES (?, ?, ?)");
@@ -116,11 +108,9 @@ public class Storage {
             IPLog.getPlugin().getLogger().error("Failed to create new connection.");
             e.printStackTrace();
         }
-
     }
 
     public void updateConnection(InetAddress ip, UUID uuid, LocalDateTime time) {
-
         try (
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("UPDATE REGISTRY SET INSTANT = ? WHERE IP = ? AND ID = ?");
@@ -134,11 +124,9 @@ public class Storage {
             IPLog.getPlugin().getLogger().error("Failed to update old connection.");
             e.printStackTrace();
         }
-
     }
 
     public void purgeConnection(InetAddress ip, UUID uuid) {
-
         try (
             Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement("DELETE FROM REGISTRY WHERE IP = ? AND ID = ?");
@@ -151,12 +139,10 @@ public class Storage {
             IPLog.getPlugin().getLogger().error("Failed to purge connection.");
             e.printStackTrace();
         }
-
     }
 
     public Set<UUID> getAliases(UUID uuid) {
-
-        Set<UUID> aliases = new HashSet<>();
+        final Set<UUID> aliases = new HashSet<>();
 
         try (
             Connection conn = getConnection();
@@ -175,12 +161,10 @@ public class Storage {
         }
 
         return aliases;
-
     }
 
     public Set<UUID> getPlayers(InetAddress ip) {
-
-        Set<UUID> players = new HashSet<>();
+        final Set<UUID> players = new HashSet<>();
 
         try (
             Connection conn = getConnection();
@@ -199,12 +183,10 @@ public class Storage {
         }
 
         return players;
-
     }
 
     public Set<String> getAddresses(UUID uuid) {
-
-        Set<String> addresses = new HashSet<>();
+        final Set<String> addresses = new HashSet<>();
 
         try (
             Connection conn = getConnection();
@@ -225,12 +207,10 @@ public class Storage {
         }
 
         return addresses;
-
     }
 
     public Map<String, LocalDateTime> getAddressesAndTime(UUID uuid) {
-
-        Map<String, LocalDateTime> data = new HashMap<>();
+        final Map<String, LocalDateTime> data = new HashMap<>();
 
         try (
             Connection conn = getConnection();
@@ -249,12 +229,10 @@ public class Storage {
         }
 
         return data;
-
     }
 
     public Map<UUID, LocalDateTime> getPlayersAndTime(InetAddress ip) {
-
-        Map<UUID, LocalDateTime> data = new HashMap<>();
+        final Map<UUID, LocalDateTime> data = new HashMap<>();
 
         try (
             Connection conn = getConnection();
@@ -273,7 +251,6 @@ public class Storage {
         }
 
         return data;
-
     }
 
 }

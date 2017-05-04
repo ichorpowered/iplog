@@ -15,26 +15,31 @@ group = pluginGroup
 version = pluginVersion
 
 repositories {
+    jcenter()
     maven {
         name = "aikar"
         url = "https://ci.emc.gs/nexus/content/groups/aikar"
     }
-}
-
-configurations {
-    shade
-
-    compile.extendsFrom shade
+    maven {
+        name = 'bstats'
+        url = 'https://repo.bstats.org/content/groups/public/'
+    }
 }
 
 shadowJar {
-    configurations = [project.configurations.shade]
+    dependencies {
+        include dependency('org.bstats:bstats-sponge-lite')
+        include dependency('co.aikar:taskchain-sponge')
+    }
+
+    relocate 'org.bstats', 'com.meronat.iplog.metrics'
+    relocate 'co.aikar', 'com.meronat.iplog.taskchain'
 }
 
 dependencies {
-    compile 'org.spongepowered:spongeapi:5.1.0-SNAPSHOT'
-
-    shade "co.aikar:taskchain-sponge:3.4.3"
+    compile 'org.spongepowered:spongeapi:5.1.0'
+    compile 'co.aikar:taskchain-sponge:3.6.0'
+    compile 'org.bstats:bstats-sponge-lite:1.1'
 }
 
 tasks.build.dependsOn(shadowJar)

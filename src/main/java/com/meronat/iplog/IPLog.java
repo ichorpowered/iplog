@@ -33,9 +33,9 @@ import com.meronat.iplog.commands.HistoryCommand;
 import com.meronat.iplog.commands.IpElement;
 import com.meronat.iplog.commands.LookupCommand;
 import com.meronat.iplog.commands.PurgeCommand;
-import com.meronat.iplog.stats.Metrics;
 import com.meronat.iplog.storage.Storage;
 
+import org.bstats.MetricsLite;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -64,7 +64,7 @@ import co.aikar.taskchain.TaskChainFactory;
 @Plugin(
     id = "iplog",
     name = "IPLog",
-    version = "0.1.1",
+    version = "0.2.0-SNAPSHOT",
     description = "Connects IP addresses to users, allowing you to catch alternates and similar.",
     url = "http://meronat.com",
     authors = {"Meronat", "Nighteyes604", "Redrield"})
@@ -77,29 +77,26 @@ public final class IPLog {
     private Path parentPath;
     private PluginContainer pluginContainer;
 
-    private static TaskChainFactory factory;
+    private TaskChainFactory factory;
 
     @Inject
-    private Metrics metrics;
+    private MetricsLite metrics;
 
     @Inject
     public IPLog(Logger logger, @ConfigDir(sharedRoot = false) Path path, PluginContainer pluginContainer) {
-
         plugin = this;
 
         this.logger = logger;
         this.parentPath = path;
         this.pluginContainer = pluginContainer;
-
     }
 
     @Listener
     public void onGamePreInitialization(GamePreInitializationEvent event) {
-
-        factory = SpongeTaskChainFactory.create(pluginContainer);
+        this.factory = SpongeTaskChainFactory.create(pluginContainer);
 
         try {
-            storage = new Storage();
+            this.storage = new Storage();
         } catch (SQLException e) {
             this.logger.warn("IPLog will not load as it failed to connect or load storage.");
             e.printStackTrace();
@@ -110,12 +107,10 @@ public final class IPLog {
         registerCommands();
 
         Sponge.getEventManager().registerListeners(this, new JoinListener());
-
     }
 
     private void registerCommands() {
-
-        Map<List<String>, CommandSpec> children = new HashMap<>();
+        final Map<List<String>, CommandSpec> children = new HashMap<>();
 
         children.put(Lists.newArrayList("help", "helpme", "?"), CommandSpec.builder()
             .description(Text.of("Displays command information for IPLog."))
@@ -174,7 +169,6 @@ public final class IPLog {
             .build(), "ip", "iplog", "ipregister");
 
         this.logger.info("Commands have been successfully registered.");
-
     }
 
     public Path getParentPath() {
@@ -197,11 +191,12 @@ public final class IPLog {
         return plugin;
     }
 
-    public static <T> TaskChain<T> newChain() {
-        return factory.newChain();
+    public <T> TaskChain<T> newChain() {
+        return this.factory.newChain();
     }
 
-    public static <T> TaskChain<T> newSharedChain(String name) {
-        return factory.newSharedChain(name);
+    public <T> TaskChain<T> newSharedChain(String name) {
+        return this.factory.newSharedChain(name);
     }
+
 }

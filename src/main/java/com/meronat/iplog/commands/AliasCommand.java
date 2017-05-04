@@ -48,18 +48,17 @@ public class AliasCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
-        Optional<User> optionalUser = args.getOne("player");
+        final Optional<User> optionalUser = args.getOne("player");
 
         if (!optionalUser.isPresent()) {
             throw new CommandException(Text.of(TextColors.RED, "You must specify an existing user."));
         }
 
-        User user = optionalUser.get();
+        final User user = optionalUser.get();
 
-        IPLog.newChain()
+        IPLog.getPlugin().newChain()
                 .asyncFirst(() -> {
-                    Set<UUID> users = IPLog.getPlugin().getStorage().getAliases(user.getUniqueId());
+                    final Set<UUID> users = IPLog.getPlugin().getStorage().getAliases(user.getUniqueId());
                     if (src instanceof User) {
                         UUID sender = ((User) src).getUniqueId();
                         if (sender.equals(user.getUniqueId())) {
@@ -74,7 +73,7 @@ public class AliasCommand implements CommandExecutor {
                 })
                 .abortIfNull()
                 .syncLast(users -> {
-                    UserStorageService userStorageService = Sponge.getServiceManager().provide(UserStorageService.class).get();
+                    final UserStorageService userStorageService = Sponge.getServiceManager().provide(UserStorageService.class).get();
                     Sponge.getServiceManager().provide(PaginationService.class).get().builder()
                             .title(Text.of(TextColors.DARK_GREEN, "Aliases of ", TextColors.GREEN, user.getName()))
                             .contents(users.stream()
@@ -91,7 +90,6 @@ public class AliasCommand implements CommandExecutor {
                 }).execute();
 
         return CommandResult.success();
-
     }
 
 }

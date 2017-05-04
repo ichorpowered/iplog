@@ -52,21 +52,19 @@ public class HistoryCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
-        Optional<User> optionalUser = args.getOne("player");
-
-        Optional<InetAddress> optionalAddress = args.getOne("ip");
+        final Optional<User> optionalUser = args.getOne("player");
+        final Optional<InetAddress> optionalAddress = args.getOne("ip");
 
         if (optionalUser.isPresent() && optionalAddress.isPresent()) {
             throw new CommandException(Text.of(TextColors.RED, "You must specify either an IP address or player, but not both."));
         }
 
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME.withLocale(src.getLocale());
+        final DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME.withLocale(src.getLocale());
 
         if (optionalAddress.isPresent()) {
-            IPLog.newChain()
+            IPLog.getPlugin().newChain()
                     .asyncFirst(() -> {
-                        Map<UUID, LocalDateTime> users = IPLog.getPlugin().getStorage().getPlayersAndTime(optionalAddress.get());
+                        final Map<UUID, LocalDateTime> users = IPLog.getPlugin().getStorage().getPlayersAndTime(optionalAddress.get());
 
                         if(users.isEmpty()) {
                             src.sendMessage(Text.of(TextColors.RED, "There are no players associated with this IP address."));
@@ -76,11 +74,11 @@ public class HistoryCommand implements CommandExecutor {
                     })
                     .abortIfNull()
                     .syncLast(users -> {
-                        UserStorageService userStorageService = Sponge.getServiceManager().provide(UserStorageService.class).get();
-                        List<Text> contents = new ArrayList<>();
+                        final UserStorageService userStorageService = Sponge.getServiceManager().provide(UserStorageService.class).get();
+                        final List<Text> contents = new ArrayList<>();
 
-                        users.entrySet().forEach(e -> userStorageService.get(e.getKey()).ifPresent(user -> contents.add(Text.of(TextColors.DARK_GREEN, user.getName(),
-                                TextColors.GRAY, "    ", timeFormatter.format(e.getValue())))));
+                        users.forEach((key, value) -> userStorageService.get(key).ifPresent(user ->
+                                contents.add(Text.of(TextColors.DARK_GREEN, user.getName(), TextColors.GRAY, "    ", timeFormatter.format(value)))));
 
                         Sponge.getServiceManager().provide(PaginationService.class).get().builder()
                                 .title(Text.of(TextColors.DARK_GREEN, "User History Associated With", TextColors.GREEN, optionalAddress.get().toString()))
@@ -90,9 +88,9 @@ public class HistoryCommand implements CommandExecutor {
                                 .sendTo(src);
                     }).execute();
         } else if (optionalUser.isPresent()) {
-            IPLog.newChain()
+            IPLog.getPlugin().newChain()
                     .asyncFirst(() -> {
-                        Map<String, LocalDateTime> addresses = IPLog.getPlugin().getStorage().getAddressesAndTime(optionalUser.get().getUniqueId());
+                        final Map<String, LocalDateTime> addresses = IPLog.getPlugin().getStorage().getAddressesAndTime(optionalUser.get().getUniqueId());
 
                         if(addresses.isEmpty()) {
                             src.sendMessage(Text.of(TextColors.RED, "There are no IP addresses associated with this user."));
@@ -103,9 +101,9 @@ public class HistoryCommand implements CommandExecutor {
                     })
                     .abortIfNull()
                     .syncLast(addresses -> {
-                        List<Text> contents = new ArrayList<>();
+                        final List<Text> contents = new ArrayList<>();
 
-                        addresses.entrySet().forEach(e -> contents.add(Text.of(TextColors.DARK_GREEN, e.getKey(), "    ", timeFormatter.format(e.getValue()))));
+                        addresses.forEach((key, value) -> contents.add(Text.of(TextColors.DARK_GREEN, key, "    ", timeFormatter.format(value))));
 
                         Sponge.getServiceManager().provide(PaginationService.class).get().builder()
                                 .title(Text.of(TextColors.DARK_GREEN, "IP History Associated With ", TextColors.GREEN, optionalUser.get().getName()))
@@ -120,7 +118,6 @@ public class HistoryCommand implements CommandExecutor {
         }
 
         return CommandResult.success();
-
     }
 
 }

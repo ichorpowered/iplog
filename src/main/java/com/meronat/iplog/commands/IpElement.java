@@ -41,14 +41,11 @@ import java.util.List;
 public class IpElement extends CommandElement {
 
     public IpElement( Text key) {
-
         super(key);
-
     }
 
     @Override
     protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-
         if(!args.hasNext()) {
             throw args.createError(Text.of(TextColors.RED, "You must specify an IP address."));
         }
@@ -58,7 +55,6 @@ public class IpElement extends CommandElement {
         } catch (UnknownHostException e) {
             throw args.createError(Text.of(TextColors.RED, "This is not a valid IP address."));
         }
-
     }
 
     @Override

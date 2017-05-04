@@ -43,8 +43,7 @@ public class HelpCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
-        List<Text> contents = new ArrayList<>();
+        final List<Text> contents = new ArrayList<>();
 
         contents.add(formatHelpText("/ip", "Displays basic information about IPLog.", Text.of("IPLog v0.1.1")));
 
@@ -72,7 +71,6 @@ public class HelpCommand implements CommandExecutor {
             .sendTo(src);
 
         return CommandResult.success();
-
     }
 
     private Text formatHelpText(String command, String description, Text extendedDescription) {
