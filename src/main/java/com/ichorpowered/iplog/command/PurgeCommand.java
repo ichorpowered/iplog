@@ -23,39 +23,44 @@
  * THE SOFTWARE.
  */
 
-package com.meronat.iplog.commands;
+package com.ichorpowered.iplog.command;
 
+import com.ichorpowered.iplog.IPLog;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
-import org.apache.commons.lang3.StringUtils;
+import java.net.InetAddress;
+import java.util.Optional;
 
-public class BaseCommand implements CommandExecutor {
+public class PurgeCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        src.sendMessage(Text.of(TextColors.DARK_GREEN, "IPLog", " v", Sponge.getPluginManager().getPlugin("iplog").get().getVersion().get()));
-        src.sendMessage(Text.of(TextColors.GRAY, "Created by ", StringUtils.join(Sponge.getPluginManager().getPlugin("iplog").get().getAuthors(), ", ")));
-        src.sendMessage(Text.builder("Click here for ")
-            .color(TextColors.GRAY)
-            .onClick(TextActions.runCommand("/ip help"))
-            .onHover(TextActions.showText(Text.of("/ip help")))
-            .append(Text.builder("IPLog")
-                .color(TextColors.DARK_GREEN)
-                .onClick(TextActions.runCommand("/ip help"))
-                .onHover(TextActions.showText(Text.of("/ip help")))
-                .append(Text.builder(" help.")
-                    .color(TextColors.GRAY)
-                    .onClick(TextActions.runCommand("/ip help"))
-                    .onHover(TextActions.showText(Text.of("/ip help")))
-                    .build()).build()).build());
+        final Optional<User> optionalUser = args.getOne("player");
+
+        if (!optionalUser.isPresent()) {
+            throw new CommandException(Text.of(TextColors.RED, "You must specify an existing user."));
+        }
+
+        final Optional<InetAddress> optionalIP = args.getOne("ip");
+
+        if (!optionalIP.isPresent()) {
+            throw new CommandException(Text.of(TextColors.RED, "You must specify a proper IP address."));
+        }
+
+        final User user = optionalUser.get();
+        final InetAddress ip = optionalIP.get();
+
+        Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> IPLog.getPlugin().getStorage().purgeConnection(ip, user.getUniqueId()));
+
+        src.sendMessage(Text.of(TextColors.YELLOW, "You have successfully removed the specified connection from the database."));
 
         return CommandResult.success();
     }

@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-package com.meronat.iplog.commands;
+package com.ichorpowered.iplog.command;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -31,6 +31,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -43,42 +44,47 @@ public class HelpCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        final List<Text> contents = new ArrayList<>();
-
-        contents.add(formatHelpText("/ip", "Displays basic information about IPLog.", Text.of("IPLog v0.1.1")));
-
-        contents.add(formatHelpText("/ip help", "Displays this page, giving information about IPLog commands.", Text.of("Click here for IPLog help")));
-
-        contents.add(formatHelpText("/ip alias [player]", "Shows all possible players associated with this player.", Text.of("Good for finding alternate accounts")));
-
-        contents.add(formatHelpText("/ip lookup [player]", "Lists all the IPs associated with the specified player.", Text.of("Can also be used with IPs")));
-
-        contents.add(formatHelpText("/ip lookup [ip]", "Lists all the players associated with the specified IP.", Text.of("Can also be used with users")));
-
-        contents.add(formatHelpText("/ip history [player]", "Displays all IPs associated with a player and their last date of login", Text.of("Can also be used with IPs")));
-
-        contents.add(formatHelpText("/ip history [ip]", "Displays all users associated with an IP and their last date of login", Text.of("Can also be used with users")));
-
-        contents.add(formatHelpText("/ip add [player] [ip]", "Adds a connection between a player and an IP", Text.of("You must specify both")));
-
-        contents.add(formatHelpText("/ip purge [player] [ip]", "Removes the connection between a player and an IP", Text.of("You must specify both")));
-
-        Sponge.getServiceManager().provide(PaginationService.class).get().builder()
-            .title(Text.of(TextColors.DARK_GREEN, "IPLog Help"))
-            .linesPerPage(14)
-            .padding(Text.of(TextColors.GRAY, "="))
-            .contents(contents)
-            .sendTo(src);
+        getPaginationList().sendTo(src);
 
         return CommandResult.success();
     }
 
-    private Text formatHelpText(String command, String description, Text extendedDescription) {
+    private static Text formatHelpText(String command, String description, Text extendedDescription) {
         return Text.of(Text.builder(command)
             .color(TextColors.GREEN)
             .onClick(TextActions.suggestCommand(command))
             .onHover(TextActions.showText(extendedDescription))
             .build(),Text.of(TextColors.GRAY, " - ", description));
+    }
+
+    private static PaginationList getPaginationList() {
+        final List<Text> contents = new ArrayList<>();
+
+        contents.add(formatHelpText("/ip", "Displays basic information about IPLog.",
+                Text.of("IPLog v0.1.1")));
+        contents.add(formatHelpText("/ip help", "Displays this page, giving information about IPLog commands.",
+                Text.of("Click here for IPLog help")));
+        contents.add(formatHelpText("/ip alias [player]", "Shows all possible players associated with this player.",
+                Text.of("Good for finding alternate accounts")));
+        contents.add(formatHelpText("/ip lookup [player]", "Lists all the IPs associated with the specified player.",
+                Text.of("Can also be used with IPs")));
+        contents.add(formatHelpText("/ip lookup [ip]", "Lists all the players associated with the specified IP.",
+                Text.of("Can also be used with users")));
+        contents.add(formatHelpText("/ip history [player]", "Displays all IPs associated with a player and their last date of login",
+                Text.of("Can also be used with IPs")));
+        contents.add(formatHelpText("/ip history [ip]", "Displays all users associated with an IP and their last date of login",
+                Text.of("Can also be used with users")));
+        contents.add(formatHelpText("/ip add [player] [ip]", "Adds a connection between a player and an IP",
+                Text.of("You must specify both")));
+        contents.add(formatHelpText("/ip purge [player] [ip]", "Removes the connection between a player and an IP",
+                Text.of("You must specify both")));
+
+        return Sponge.getServiceManager().provide(PaginationService.class).get().builder()
+                .title(Text.of(TextColors.DARK_GREEN, "IPLog Help"))
+                .linesPerPage(14)
+                .padding(Text.of(TextColors.GRAY, "="))
+                .contents(contents)
+                .build();
     }
 
 }

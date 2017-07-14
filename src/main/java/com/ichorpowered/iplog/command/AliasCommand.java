@@ -23,10 +23,9 @@
  * THE SOFTWARE.
  */
 
-package com.meronat.iplog.commands;
+package com.ichorpowered.iplog.command;
 
-import com.meronat.iplog.IPLog;
-
+import com.ichorpowered.iplog.IPLog;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -34,14 +33,17 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.pagination.PaginationService;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.net.InetAddress;
-import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-public class AddCommand implements CommandExecutor {
+public class AliasCommand implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
@@ -51,22 +53,38 @@ public class AddCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, "You must specify an existing user."));
         }
 
-        final Optional<InetAddress> optionalIP = args.getOne("ip");
-
-        if (!optionalIP.isPresent()) {
-            throw new CommandException(Text.of(TextColors.RED, "You must specify a proper IP address."));
-        }
-
         final User user = optionalUser.get();
-        final InetAddress ip = optionalIP.get();
 
-        if (IPLog.getPlugin().getStorage().isPresent(ip, user.getUniqueId())) {
-            throw new CommandException(Text.of(TextColors.RED, "This connection already exists in the database."));
-        }
+        Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> {
+            final Set<UUID> users = IPLog.getPlugin().getStorage().getAliases(user.getUniqueId());
+            if (src instanceof User) {
+                UUID sender = ((User) src).getUniqueId();
+                if (sender.equals(user.getUniqueId())) {
+                    users.remove(sender);
+                }
+            }
+            if (users.size() == 0) {
+                src.sendMessage(Text.of(TextColors.RED, "There are no aliases associated with the specified user."));
+                return;
+            }
 
-        Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> IPLog.getPlugin().getStorage().addConnection(ip, user.getUniqueId(), LocalDateTime.now()));
-
-        src.sendMessage(Text.of(TextColors.YELLOW, "You have successfully added the specified connection to the database."));
+            Sponge.getScheduler().createSyncExecutor(IPLog.getPlugin()).execute(() -> {
+                final UserStorageService userStorageService = Sponge.getServiceManager().provide(UserStorageService.class).get();
+                Sponge.getServiceManager().provide(PaginationService.class).get().builder()
+                        .title(Text.of(TextColors.DARK_GREEN, "Aliases of ", TextColors.GREEN, user.getName()))
+                        .contents(users.stream()
+                                .map(userStorageService::get)
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .map(User::getName)
+                                .map(Text::of)
+                                .map(username -> Text.of(TextColors.DARK_GREEN, username))
+                                .collect(Collectors.toList()))
+                        .linesPerPage(14)
+                        .padding(Text.of(TextColors.GRAY, "="))
+                        .sendTo(src);
+            });
+        });
 
         return CommandResult.success();
     }

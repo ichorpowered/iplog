@@ -23,9 +23,7 @@
  * THE SOFTWARE.
  */
 
-package com.meronat.iplog;
-
-import com.meronat.iplog.storage.Storage;
+package com.ichorpowered.iplog;
 
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;

@@ -23,19 +23,19 @@
  * THE SOFTWARE.
  */
 
-package com.meronat.iplog;
+package com.ichorpowered.iplog;
 
-import com.meronat.iplog.commands.AddCommand;
-import com.meronat.iplog.commands.AliasCommand;
-import com.meronat.iplog.commands.BaseCommand;
-import com.meronat.iplog.commands.HelpCommand;
-import com.meronat.iplog.commands.HistoryCommand;
-import com.meronat.iplog.commands.IpElement;
-import com.meronat.iplog.commands.LookupCommand;
-import com.meronat.iplog.commands.PurgeCommand;
-import com.meronat.iplog.storage.Storage;
-
-import org.bstats.MetricsLite;
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.ichorpowered.iplog.command.AddCommand;
+import com.ichorpowered.iplog.command.AliasCommand;
+import com.ichorpowered.iplog.command.BaseCommand;
+import com.ichorpowered.iplog.command.HelpCommand;
+import com.ichorpowered.iplog.command.HistoryCommand;
+import com.ichorpowered.iplog.command.IpElement;
+import com.ichorpowered.iplog.command.LookupCommand;
+import com.ichorpowered.iplog.command.PurgeCommand;
+import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -46,28 +46,19 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
-import org.slf4j.Logger;
-
-import com.google.common.collect.Lists;
-import com.google.inject.Inject;
-
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import co.aikar.taskchain.SpongeTaskChainFactory;
-import co.aikar.taskchain.TaskChain;
-import co.aikar.taskchain.TaskChainFactory;
-
 @Plugin(
     id = "iplog",
     name = "IPLog",
-    version = "0.2.0-SNAPSHOT",
+    version = "0.2.0",
     description = "Connects IP addresses to users, allowing you to catch alternates and similar.",
     url = "http://meronat.com",
-    authors = {"Meronat", "Nighteyes604", "Redrield"})
+    authors = {"Meronat", "IchorPowered"})
 public final class IPLog {
 
     private static IPLog plugin;
@@ -76,11 +67,6 @@ public final class IPLog {
     private Storage storage;
     private Path parentPath;
     private PluginContainer pluginContainer;
-
-    private TaskChainFactory factory;
-
-    @Inject
-    private MetricsLite metrics;
 
     @Inject
     public IPLog(Logger logger, @ConfigDir(sharedRoot = false) Path path, PluginContainer pluginContainer) {
@@ -93,8 +79,6 @@ public final class IPLog {
 
     @Listener
     public void onGamePreInitialization(GamePreInitializationEvent event) {
-        this.factory = SpongeTaskChainFactory.create(pluginContainer);
-
         try {
             this.storage = new Storage();
         } catch (SQLException e) {
@@ -189,14 +173,6 @@ public final class IPLog {
 
     public static IPLog getPlugin() {
         return plugin;
-    }
-
-    public <T> TaskChain<T> newChain() {
-        return this.factory.newChain();
-    }
-
-    public <T> TaskChain<T> newSharedChain(String name) {
-        return this.factory.newSharedChain(name);
     }
 
 }

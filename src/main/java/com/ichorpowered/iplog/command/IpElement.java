@@ -23,47 +23,54 @@
  * THE SOFTWARE.
  */
 
-package com.meronat.iplog.commands;
-
-import com.meronat.iplog.IPLog;
+package com.ichorpowered.iplog.command;
 
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.ArgumentParseException;
+import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.net.InetAddress;
-import java.util.Optional;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class PurgeCommand implements CommandExecutor {
+public class IpElement extends CommandElement {
+
+    private static Text IP = LiteralText.of("<ip address>");
+    private static List<String> EMPTY_LIST = new ArrayList<>();
+
+    public IpElement( Text key) {
+        super(key);
+    }
 
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        final Optional<User> optionalUser = args.getOne("player");
-
-        if (!optionalUser.isPresent()) {
-            throw new CommandException(Text.of(TextColors.RED, "You must specify an existing user."));
+    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+        if(!args.hasNext()) {
+            throw args.createError(Text.of(TextColors.RED, "You must specify an IP address."));
         }
 
-        final Optional<InetAddress> optionalIP = args.getOne("ip");
-
-        if (!optionalIP.isPresent()) {
-            throw new CommandException(Text.of(TextColors.RED, "You must specify a proper IP address."));
+        try {
+            return InetAddress.getByName(args.next());
+        } catch (UnknownHostException e) {
+            throw args.createError(Text.of(TextColors.RED, "This is not a valid IP address."));
         }
+    }
 
-        final User user = optionalUser.get();
-        final InetAddress ip = optionalIP.get();
+    @Override
+    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+        return EMPTY_LIST;
+    }
 
-        Sponge.getScheduler().createAsyncExecutor(IPLog.getPlugin()).execute(() -> IPLog.getPlugin().getStorage().purgeConnection(ip, user.getUniqueId()));
-
-        src.sendMessage(Text.of(TextColors.YELLOW, "You have successfully removed the specified connection from the database."));
-
-        return CommandResult.success();
+    @Override
+    public Text getUsage(CommandSource src) {
+        return IP;
     }
 
 }

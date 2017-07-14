@@ -23,9 +23,7 @@
  * THE SOFTWARE.
  */
 
-package com.meronat.iplog.storage;
-
-import com.meronat.iplog.IPLog;
+package com.ichorpowered.iplog;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.sql.SqlService;
