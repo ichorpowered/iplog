@@ -1,7 +1,7 @@
 /*
  * This file is part of IPLog, licensed under the MIT License.
  *
- * Copyright (c) 2017 Meronat <http://meronat.com>
+ * Copyright (c) 2018 Meronat <http://meronat.com>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -55,9 +55,9 @@ import java.util.Map;
 @Plugin(
     id = "iplog",
     name = "IPLog",
-    version = "0.2.0",
+    version = "0.2.1",
     description = "Connects IP addresses to users, allowing you to catch alternates and similar.",
-    url = "http://meronat.com",
+    url = "http://ichorpowered.com",
     authors = {"Meronat", "IchorPowered"})
 public final class IPLog {
 

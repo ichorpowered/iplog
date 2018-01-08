@@ -1,7 +1,7 @@
 /*
  * This file is part of IPLog, licensed under the MIT License.
  *
- * Copyright (c) 2017 Meronat <http://meronat.com>
+ * Copyright (c) 2018 Meronat <http://meronat.com>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -44,7 +44,7 @@ public class IpElement extends CommandElement {
     private static Text IP = LiteralText.of("<ip address>");
     private static List<String> EMPTY_LIST = new ArrayList<>();
 
-    public IpElement( Text key) {
+    public IpElement(Text key) {
         super(key);
     }
 
